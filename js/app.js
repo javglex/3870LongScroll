@@ -7,109 +7,79 @@ Do NOT Touch Above
 var canvas = document.getElementById("canvas");
 var beam = document.getElementById("beam");
 var person = document.getElementById("person");
+var last_known_scroll_position = 0;
+var ticking = false;
+var timeElapsed=0;
 
-window.onscroll = function(){
+window.addEventListener("load", init, true);
 
+function init()
+{
+  generateRandomBeams();
+  setInterval(moveBeams,50);
+  window.addEventListener('mousewheel', function(e)
+  {
+    last_known_scroll_position += e.wheelDelta||e.detail;
 
-  var y = window.pageYOffset;
+    if (!ticking)
+    {
 
-    var q = 40;
+      window.requestAnimationFrame(function()
+      {
+        timeElapsed+=last_known_scroll_position/150;
+        ticking = false;
+      });
+       
+      ticking = true;
 
-    console.log(y);
-    console.log(q);
-
-    beam.style.top = 400 + y * .5 + "px";
-
- //  if (y > 2000) {
- //    counter.style.backgroundColor = "green";
- //  }else{
- //    counter.style.backgroundColor = "blue";}
- //
- //    icon.style.top = 200 + y  + "px";
- //
- //  if(y > 2000){
- //
- //      icon.src="https://2.bp.blogspot.com/-MTmoGMeE2cc/WSGIutFSHoI/AAAAAAAAK6o/Ya-tX6NvAqUM2LqV4VlxzsfwzD8xXEPFACLcB/s1600/254___thumbs-up-emoji.png";
- //
- //  }else{
- //
- //  icon.src="https://1.bp.blogspot.com/-jnt2C7f2HH8/WSGIun5uhGI/AAAAAAAAK6s/A1R4fUrtMUsQtEbKqopa2xTWqaEtxClogCLcB/s1600/256___come-to-fight-emoji.png";
- // }
-
-};
+    }
+  });
+}
 
 
-// cloud experiment
-// var canvas = document.getElementById("canvas");
-// var clouds = document.getElementById("clouds");
-// var y = window.pageYOffset;
-//
-//
-//
-// window.onscroll = function(){
-//
-//
-//   var y = window.pageYOffset;
-//
-//   var q = 40;
-//
-//   console.log(y);
-//   console.log(q);
-//
-//   cloud1.style.top = 400 + y * .5 + "px";
-//
-//
-//
-//   // cloud1.style.top = y;
-//
-// };
-
-// random beam gen
-function moveBeam() {
+// random beam gen, initializes starting position of beams
+function generateRandomBeams() {
   var $spans = $(".logo");
 
   $spans.each(function(){
     var _this = $(this);
 
-    _this.fadeOut(500, function() {
+    _this.fadeOut(0, function() {
       var maxLeft = $(window).width() - _this.width();
       var maxTop = $(window).height() - _this.height();
       var leftPos = Math.floor(Math.random() * (maxLeft + 10))
       var topPos = Math.floor(Math.random() * (maxTop + 10))
 
-      _this.css({ left: leftPos, top: topPos }).fadeIn(100);
+      _this.css({ left: leftPos, top: topPos }).fadeIn(0);
       console.log(leftPos,topPos);
     });
   });
 };
 
-moveBeam();
-// setInterval(moveBeam, 1000);
+//moves beams at an interval, set in init() function
+function moveBeams(){
+  
+  timeElapsed+=10;
+
+  var $spans = $(".logo");
+
+  $spans.each(function()
+  {
+    var _this = $(this);
 
 
-//attempts to place image using js
-// var img1 = new Image();
-// var imgBeam = document.getElementsByClassName('.logo');
-// document.getElementsByClassName('.logo').height = "300";
-//
-// img1.onload = function() {
-//   imgBeam.appendChild(img1);
-// };
-//
-// img1.src = '../img/beam_scale.svg';
+    _this.css('top', timeElapsed+'px');
+    if (_this.position().top>$(window).height())
+    {
+      timeElapsed=0;
+      generateRandomBeams();  //reset their starting positions
+    }
 
-// function myFunction() {
-//     var img1 = document.getElementsByClassName('logo');
-//     img1.setAttribute("src", "../img/beam_scale.svg");
-//     img1.setAttribute("height", "300");
-//     document.getElementsByClassName('logo').appendChild(img1);
-// }
+    console.log("time elapsed: " + timeElapsed,
+                "current top pos " + _this.position().top );
 
-// var img = new Image();
-// var div = document.getElementById('logo');
-//
-// img.onload = function() {
-//   div.appendChild(img);
-// };
-//
-// img.src = 'beam_scale.svg';
+  });
+
+}
+
+
